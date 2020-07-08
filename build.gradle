@@ -1,0 +1,120 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.jooq:jooq:3.13.2'
+        classpath 'org.jooq:jooq-codegen:3.13.2'
+        classpath 'mysql:mysql-connector-java:5.1.39'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'com.gradle.build-scan' version '3.3.4'
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'maven'
+    id "org.flywaydb.flyway" version "6.5.0"
+    id 'jacoco'
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-dependencies:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc:2.2.6.RELEASE'
+    implementation "org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE"
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq:2.2.6.RELEASE'
+
+    implementation 'org.jooq:jooq:3.13.2'
+    implementation 'org.jooq:jooq-meta:3.13.2'
+    implementation 'org.jooq:jooq-codegen:3.13.2'
+
+    implementation 'mysql:mysql-connector-java:5.1.39'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
+
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.guava:guava:29.0-jre'
+
+    compile 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    testCompileOnly 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    components {
+        withModule('org.springframework:spring-beans') {
+            allVariants {
+                withDependencyConstraints {
+                    it.findAll { it.name == 'snakeyaml' }.each { it.version { strictly '1.19' } }
+                }
+            }
+        }
+    }
+}
+
+import org.jooq.codegen.GenerationTool
+task generateJooq {
+    doLast {
+        def writer = new StringWriter()
+        def xml = new groovy.xml.MarkupBuilder(writer)
+                .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd') {
+                    jdbc() {
+                        driver('com.mysql.jdbc.Driver')
+                        url('jdbc:mysql://localhost:3306?useUnicode=true&autoReconnect=true&useAffectedRows=true&characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=true')
+                        user('root')
+                        password('password')
+                    }
+                    generator() {
+                        database() {
+                            inputSchema 'order_system'
+                        }
+                        generate([:]) {
+                            relation true
+                            validationAnnotations true
+                            pojos true
+                            daos true
+                            records true
+                        }
+                        target() {
+                            packageName('com.victor.backend.projects.orderSystem.db')
+                            directory('src/main/java')
+                        }
+                    }
+                }
+
+        GenerationTool.generate(writer.toString())
+    }
+}
+
+flyway {
+    url = 'jdbc:mysql://localhost:3306?useUnicode=true&autoReconnect=true&useAffectedRows=true&characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=true'
+    user = 'root'
+    password = 'password'
+    schemas = ['order_system']
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacoco/html")
+    }
+}
