@@ -239,7 +239,7 @@ public class AppTest {
     public void testPlaceOrderFailWithEmptyCoordination() throws Exception {
         PlaceOrderReq req = new PlaceOrderReq();
         req.setOrigin(Arrays.asList(null, "-180"));
-        req.setDestination(Arrays.asList("-90", ""));
+        req.setDestination(Arrays.asList("-90", null));
 
         mvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
