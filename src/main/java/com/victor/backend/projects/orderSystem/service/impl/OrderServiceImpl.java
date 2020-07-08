@@ -129,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
                 OrderStatus.TAKEN);
 
         if(resultNum != 1) {
-            throw new OrderHasTakenException("The order has already been taken by someone else!");
+            throw new OrderHasTakenException("The order has already been taken by someone else or the id is invalid!");
         }
     }
 
