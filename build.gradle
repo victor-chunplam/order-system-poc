@@ -19,6 +19,7 @@ plugins {
     id 'maven'
     id "org.flywaydb.flyway" version "6.5.0"
     id 'jacoco'
+    id 'net.saliman.properties' version '1.4.2'
 }
 
 repositories {
@@ -65,6 +66,16 @@ dependencies {
     }
 }
 
+bootRun {
+    group = 'Application'
+
+    doFirst() {
+        main = bootJar.mainClassName
+        classpath = sourceSets.main.runtimeClasspath
+        systemProperty 'spring.profiles.active', project.ext['environmentName']
+    }
+}
+
 import org.jooq.codegen.GenerationTool
 task generateJooq {
     doLast {
@@ -73,7 +84,7 @@ task generateJooq {
                 .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd') {
                     jdbc() {
                         driver('com.mysql.jdbc.Driver')
-                        url('jdbc:mysql://localhost:3306?useUnicode=true&autoReconnect=true&useAffectedRows=true&characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=true')
+                        url(project.ext['dbUrl'])
                         user('root')
                         password('password')
                     }
@@ -82,7 +93,6 @@ task generateJooq {
                             inputSchema 'order_system'
                         }
                         generate([:]) {
-                            relation true
                             validationAnnotations true
                             pojos true
                             daos true
@@ -100,7 +110,7 @@ task generateJooq {
 }
 
 flyway {
-    url = 'jdbc:mysql://localhost:3306?useUnicode=true&autoReconnect=true&useAffectedRows=true&characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=true'
+    url = project.ext['dbUrl']
     user = 'root'
     password = 'password'
     schemas = ['order_system']
