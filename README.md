@@ -39,6 +39,7 @@ To build the project, run following command:
 # Create Code Coverage Report
 To create code coverage report in html format, 
 -   Comment this code: `@ActiveProfiles( {"prod"} )`
--   Run following command: `./gradlew test`
+-   Run following command: 
+`./gradlew test -PenvironmentName=dev -Dorg.gradle.java.home=jdk1.8.0_171.jdk/Contents/Home`
 
 `build/jacoco/html/index.html` will be created.
