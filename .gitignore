@@ -25,6 +25,7 @@ hs_err_pid*
 # Custom
 .idea
 .gradle
+!gradle/wrapper/gradle-wrapper.jar
 build
 docker-cache
 order-system-poc.iml
