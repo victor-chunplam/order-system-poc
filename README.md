@@ -9,7 +9,6 @@ powered by Google Map API service.
 - JOOQ - DB query and code generation
 - MySQL
 - Flyway - DB init and data migration
-- Jacoco - Code coverage report
 - Docker and Docker Compose
 - Google Maps API - https://cloud.google.com/maps-platform/routes/
 
@@ -35,11 +34,3 @@ To build the project, run following command:
 7.  `generateJooq` will be executed to generate all DB related Java files by JOOQ.
 8.  `test` will be executed so a Spring boot application testing will start.
 9.  `bootRun` will be executed so the application will start with listening to port 8080.
-
-# Create Code Coverage Report
-To create code coverage report in html format, 
--   Comment this code: `@ActiveProfiles( {"prod"} )`
--   Run following command: 
-`./gradlew test -PenvironmentName=dev -Dorg.gradle.java.home=jdk1.8.0_171.jdk/Contents/Home`
-
-`build/jacoco/html/index.html` will be created.
